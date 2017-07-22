@@ -17,6 +17,7 @@ import com.test.gank.ui.adapter.ItemListAdapter;
 import com.test.gank.ui.adapter.base.MultiItemTypeAdapter;
 import com.test.gank.ui.base.LazyLoadFragment;
 import com.test.gank.utils.App;
+import com.test.gank.utils.ListItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,9 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
         mItemList = new ArrayList<>();
         mListAdapter = new ItemListAdapter(this, mActivity, mItemList);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
+        mRecyclerView.addItemDecoration(new ListItemDecoration());
         mRecyclerView.setAdapter(mListAdapter);
+
         mRefreshLayout.setOnRefreshListener(this);
         mListAdapter.setOnItemClickListener(this);
     }
