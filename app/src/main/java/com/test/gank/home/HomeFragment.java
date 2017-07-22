@@ -10,12 +10,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.test.gank.R;
 import com.test.gank.ui.adapter.HomePagerAdapter;
 import com.test.gank.ui.base.BaseFragment;
-import com.test.gank.utils.App;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,7 @@ import butterknife.Unbinder;
  * Created by wenqin on 2017/7/22.
  */
 
-public class HomeFragment extends BaseFragment implements HomeView, Toolbar.OnMenuItemClickListener {
+public class HomeFragment extends BaseFragment implements Toolbar.OnMenuItemClickListener {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -72,21 +70,6 @@ public class HomeFragment extends BaseFragment implements HomeView, Toolbar.OnMe
         }
         mTabs.setupWithViewPager(mViewPager);
         mViewPager.setAdapter(new HomePagerAdapter(getFragmentManager(),fragmentList, mTabTitles));
-    }
-
-    @Override
-    public void showLoadingView() {
-
-    }
-
-    @Override
-    public void dismissLoadingView() {
-
-    }
-
-    @Override
-    public void showError(String error) {
-        Toast.makeText(App.getContext(), error, Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -8,4 +8,8 @@ import com.test.gank.presenter.BaseView;
 
 public interface HomeView extends BaseView{
 
+    void onAndroidRequestSuccess();
+
+    void onAndroidRequestError();
+
 }

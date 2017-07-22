@@ -2,6 +2,8 @@ package com.test.gank.api.base;
 
 import android.util.Log;
 
+import com.test.gank.api.ApiService;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -16,6 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiManger {
 
     private static volatile ApiManger sApiManger;
+    private static volatile ApiService sApiService;
 
     private HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
         @Override
@@ -69,7 +72,16 @@ public class ApiManger {
         public ApiManger build() {
             return ApiManger.get();
         }
-
     }
 
+    public ApiService getApiservice() {
+        if (sApiService == null) {
+            synchronized (ApiService.class) {
+                if (sApiService == null) {
+                    sApiService = getRetrofit().create(ApiService.class);
+                }
+            }
+        }
+        return sApiService;
+    }
 }
