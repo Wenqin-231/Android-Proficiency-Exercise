@@ -1,4 +1,4 @@
-package com.test.gank.ui.adapter;
+package com.test.gank.ui.adapter.base;
 
 /**
  * Created by wenqin on 2016/12/15.

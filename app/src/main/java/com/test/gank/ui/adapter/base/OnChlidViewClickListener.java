@@ -1,4 +1,4 @@
-package com.test.gank.ui.adapter;
+package com.test.gank.ui.adapter.base;
 
 import android.view.View;
 

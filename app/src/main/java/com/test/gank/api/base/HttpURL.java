@@ -6,5 +6,5 @@ package com.test.gank.api.base;
 
 public class HttpURL {
 
-    public static final String BASE_URL = "https://api.varyapp.com/api/";
+    public static final String BASE_URL = "http://gank.io/api/";
 }

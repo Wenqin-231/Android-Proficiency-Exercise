@@ -1,4 +1,4 @@
-package com.test.gank.ui.adapter;
+package com.test.gank.ui.adapter.base;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

@@ -3,18 +3,22 @@ package com.test.gank.home;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.test.gank.R;
-import com.test.gank.ui.fragment.BaseFragment;
+import com.test.gank.ui.adapter.HomePagerAdapter;
+import com.test.gank.ui.base.BaseFragment;
 import com.test.gank.utils.App;
-import com.test.gank.utils.SimpleTabSelectedListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,9 +34,11 @@ public class HomeFragment extends BaseFragment implements HomeView, Toolbar.OnMe
     Toolbar mToolbar;
     @BindView(R.id.tabs)
     TabLayout mTabs;
-    @BindView(R.id.child_layout)
-    FrameLayout mChildLayout;
     Unbinder unbinder;
+    @BindView(R.id.view_pager)
+    ViewPager mViewPager;
+
+    private final String[] mTabTitles = {"Android", "iOS", "前端"};
 
     public static HomeFragment newInstance() {
 
@@ -60,17 +66,12 @@ public class HomeFragment extends BaseFragment implements HomeView, Toolbar.OnMe
         mToolbar.inflateMenu(R.menu.menu_home);
         mToolbar.setOnMenuItemClickListener(this);
 
-        // setup TabLayout
-        mTabs.addTab(mTabs.newTab().setText("Android"));
-        mTabs.addTab(mTabs.newTab().setText("iOS"));
-        mTabs.addTab(mTabs.newTab().setText("前端"));
-
-        mTabs.addOnTabSelectedListener(new SimpleTabSelectedListener(){
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-                super.onTabReselected(tab);
-            }
-        });
+        List<Fragment> fragmentList = new ArrayList<>();
+        for (int i = 0; i < mTabTitles.length; i++) {
+            fragmentList.add(ItemListFragment.newInstance(i));
+        }
+        mTabs.setupWithViewPager(mViewPager);
+        mViewPager.setAdapter(new HomePagerAdapter(getFragmentManager(),fragmentList, mTabTitles));
     }
 
     @Override
