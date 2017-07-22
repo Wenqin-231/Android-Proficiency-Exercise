@@ -36,7 +36,7 @@ public class HomeFragment extends BaseFragment implements Toolbar.OnMenuItemClic
     @BindView(R.id.view_pager)
     ViewPager mViewPager;
 
-    private final String[] mTabTitles = {"Android", "iOS", "前端"};
+    public static final String[] TAB_TITLES = {"Android", "iOS", "前端"};
 
     public static HomeFragment newInstance() {
 
@@ -65,11 +65,12 @@ public class HomeFragment extends BaseFragment implements Toolbar.OnMenuItemClic
         mToolbar.setOnMenuItemClickListener(this);
 
         List<Fragment> fragmentList = new ArrayList<>();
-        for (int i = 0; i < mTabTitles.length; i++) {
+        for (int i = 0; i < TAB_TITLES.length; i++) {
             fragmentList.add(ItemListFragment.newInstance(i));
+            mViewPager.setOffscreenPageLimit(i);
         }
         mTabs.setupWithViewPager(mViewPager);
-        mViewPager.setAdapter(new HomePagerAdapter(getFragmentManager(),fragmentList, mTabTitles));
+        mViewPager.setAdapter(new HomePagerAdapter(getFragmentManager(),fragmentList, TAB_TITLES));
     }
 
     @Override

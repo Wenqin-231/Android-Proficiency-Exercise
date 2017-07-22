@@ -16,7 +16,7 @@ import rx.Observable;
  * Created by wenqin on 2017/7/22.
  */
 
-public class HomePresenterImpl extends BasePresenterImpl implements HomePresenter{
+public class HomePresenterImpl extends BasePresenterImpl implements HomePresenter {
 
     private RxFragment mFragment;
     private HomeView mHomeView;
@@ -27,18 +27,17 @@ public class HomePresenterImpl extends BasePresenterImpl implements HomePresente
     }
 
     @Override
-    public void requestAndroidData(int pageCount, int pageIndex) {
+    public void requestData(String dataStyle, int pageCount, int pageIndex) {
         mHomeView.showLoadingView();
         Observable<Result<List<GankItem>>> observable = ApiManger.get()
                 .getApiservice()
-                .requestAndroidData(pageCount, pageIndex);
-
+                .requestData(dataStyle, pageCount, pageIndex);
         HttpRx.get().doHttp(mFragment, observable, new HttpListener<List<GankItem>>() {
             @Override
             public void onNext(List<GankItem> gankItemList) {
                 if (mHomeView != null) {
                     mHomeView.dismissLoadingView();
-                    mHomeView.onAndroidRequestSuccess(gankItemList);
+                    mHomeView.onRequestSuccess(gankItemList);
                 }
             }
 
@@ -46,20 +45,10 @@ public class HomePresenterImpl extends BasePresenterImpl implements HomePresente
             public void onError(Throwable e) {
                 if (mHomeView != null) {
                     mHomeView.dismissLoadingView();
-                    mHomeView.onAndroidRequestError();
+                    mHomeView.onRequestError();
                 }
                 super.onError(e);
             }
         });
-    }
-
-    @Override
-    public void requestIOSData(int pageCount, int pageIndex) {
-
-    }
-
-    @Override
-    public void requestWebData(int pageCount, int pageIndex) {
-
     }
 }

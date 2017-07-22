@@ -7,10 +7,5 @@ import com.test.gank.presenter.BasePresenter;
  */
 
 public interface HomePresenter extends BasePresenter {
-
-    void requestAndroidData(int pageCount, int pageIndex);
-
-    void requestIOSData(int pageCount, int pageIndex);
-
-    void requestWebData(int pageCount, int pageIndex);
+    void requestData(String dataStyle, int pageCount, int pageIndex);
 }

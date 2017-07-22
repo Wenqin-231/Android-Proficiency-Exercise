@@ -21,9 +21,15 @@ public interface ApiService {
 
     @GET("data/iOS/{pageCount}/{pageIndex}")
     Observable<Result<List<GankItem>>> requestIOSData(@Path("pageCount") int pageCount,
-                                                        @Path("pageIndex") int pageIndex);
+                                                      @Path("pageIndex") int pageIndex);
 
     @GET("data/前端/{pageCount}/{pageIndex}")
     Observable<Result<List<GankItem>>> requestWedData(@Path("pageCount") int pageCount,
-                                                        @Path("pageIndex") int pageIndex);
+                                                      @Path("pageIndex") int pageIndex);
+
+    @GET("data/{dataStyle}/{pageCount}/{pageIndex}")
+    Observable<Result<List<GankItem>>> requestData(@Path("dataStyle") String dataStyle,
+                                                   @Path("pageCount") int pageCount,
+                                                   @Path("pageIndex") int pageIndex);
+
 }

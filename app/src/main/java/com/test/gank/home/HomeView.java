@@ -11,8 +11,7 @@ import java.util.List;
 
 public interface HomeView extends BaseView{
 
-    void onAndroidRequestSuccess(List<GankItem> data);
+    void onRequestSuccess(List<GankItem> data);
 
-    void onAndroidRequestError();
-
+    void onRequestError();
 }

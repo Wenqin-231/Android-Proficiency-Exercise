@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.test.gank.R;
@@ -39,6 +40,8 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     @BindView(R.id.refresh_layout)
     SwipeRefreshLayout mRefreshLayout;
     Unbinder unbinder;
+    @BindView(R.id.loading_view)
+    LinearLayout mLoadingView;
 
     private int mStatus;
 
@@ -75,7 +78,6 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        initView();
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -84,43 +86,30 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
         mListAdapter = new ItemListAdapter(this, mActivity, mItemList);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
         mRecyclerView.setAdapter(mListAdapter);
-
         mRefreshLayout.setOnRefreshListener(this);
     }
 
     @Override
     public void fetchData() {
-        switch (mStatus) {
-            case STATUS_ANDROID:
-                mHomePresenter.requestAndroidData(10, 1);
-                break;
-            case STATUS_IOS:
-                mHomePresenter.requestIOSData(10, 1);
-                break;
-            case STATUS_WEB:
-                mHomePresenter.requestWebData(10, 1);
-                break;
-        }
+        initView();
+        requestData();
+    }
+
+    private void requestData() {
+        mHomePresenter.requestData(HomeFragment.TAB_TITLES[mStatus], 10, 1);
     }
 
     @Override
     public void showLoadingView() {
-        switch (mStatus) {
-            case STATUS_ANDROID:
-
-                break;
-            case STATUS_IOS:
-
-                break;
-            case STATUS_WEB:
-
-                break;
+        // 当数据为空并且不在下拉刷新的时候显示LoadingView
+        if (mListAdapter.getItemCount() == 0 && !mRefreshLayout.isRefreshing()) {
+            mLoadingView.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void dismissLoadingView() {
-
+        mLoadingView.setVisibility(View.GONE);
     }
 
     @Override
@@ -135,7 +124,7 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     }
 
     @Override
-    public void onAndroidRequestSuccess(List<GankItem> itemList) {
+    public void onRequestSuccess(List<GankItem> itemList) {
         mRefreshLayout.setRefreshing(false);
         mItemList.clear();
         mItemList.addAll(itemList);
@@ -143,12 +132,12 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     }
 
     @Override
-    public void onAndroidRequestError() {
+    public void onRequestError() {
         mRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void onRefresh() {
-        fetchData();
+        requestData();
     }
 }
