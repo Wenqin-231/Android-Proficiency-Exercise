@@ -1,8 +1,10 @@
 package com.test.gank.api;
 
+import com.test.gank.model.GankItem;
+import com.test.gank.model.Result;
+
 import java.util.List;
 
-import retrofit2.adapter.rxjava.Result;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import rx.Observable;
@@ -14,14 +16,14 @@ import rx.Observable;
 public interface ApiService {
 
     @GET("data/Android/{pageCount}/{pageIndex}")
-    Observable<Result<List<String>>> requestAndroidData(@Path("pageCount") int pageCount,
-                                                        @Path("pageIndex") int pageIndex);
+    Observable<Result<List<GankItem>>> requestAndroidData(@Path("pageCount") int pageCount,
+                                                          @Path("pageIndex") int pageIndex);
 
     @GET("data/iOS/{pageCount}/{pageIndex}")
-    Observable<Result<List<String>>> requestIOSData(@Path("pageCount") int pageCount,
+    Observable<Result<List<GankItem>>> requestIOSData(@Path("pageCount") int pageCount,
                                                         @Path("pageIndex") int pageIndex);
 
     @GET("data/前端/{pageCount}/{pageIndex}")
-    Observable<Result<List<String>>> requestWedData(@Path("pageCount") int pageCount,
+    Observable<Result<List<GankItem>>> requestWedData(@Path("pageCount") int pageCount,
                                                         @Path("pageIndex") int pageIndex);
 }

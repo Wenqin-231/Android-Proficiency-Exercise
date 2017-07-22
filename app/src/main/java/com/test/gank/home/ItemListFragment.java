@@ -3,6 +3,7 @@ package com.test.gank.home;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +11,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.test.gank.R;
+import com.test.gank.model.GankItem;
+import com.test.gank.ui.adapter.ItemListAdapter;
 import com.test.gank.ui.base.LazyLoadFragment;
 import com.test.gank.utils.App;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,7 +27,8 @@ import butterknife.Unbinder;
  * Created by wenqin on 2017/7/22.
  */
 
-public class ItemListFragment extends LazyLoadFragment implements HomeView {
+public class ItemListFragment extends LazyLoadFragment implements HomeView,
+        SwipeRefreshLayout.OnRefreshListener {
 
     private static final String KEY_STATUS = "key_status";
     public static final int STATUS_ANDROID = 0;
@@ -36,6 +43,8 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView {
     private int mStatus;
 
     private HomePresenter mHomePresenter;
+    private List<GankItem> mItemList;
+    private ItemListAdapter mListAdapter;
 
     public static ItemListFragment newInstance(int status) {
 
@@ -62,6 +71,21 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView {
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
         unbinder = ButterKnife.bind(this, view);
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        initView();
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    private void initView() {
+        mItemList = new ArrayList<>();
+        mListAdapter = new ItemListAdapter(this, mActivity, mItemList);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
+        mRecyclerView.setAdapter(mListAdapter);
+
+        mRefreshLayout.setOnRefreshListener(this);
     }
 
     @Override
@@ -111,12 +135,20 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView {
     }
 
     @Override
-    public void onAndroidRequestSuccess() {
-
+    public void onAndroidRequestSuccess(List<GankItem> itemList) {
+        mRefreshLayout.setRefreshing(false);
+        mItemList.clear();
+        mItemList.addAll(itemList);
+        mListAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onAndroidRequestError() {
+        mRefreshLayout.setRefreshing(false);
+    }
 
+    @Override
+    public void onRefresh() {
+        fetchData();
     }
 }

@@ -3,12 +3,13 @@ package com.test.gank.home;
 import com.test.gank.api.base.ApiManger;
 import com.test.gank.api.base.HttpListener;
 import com.test.gank.api.base.HttpRx;
+import com.test.gank.model.GankItem;
+import com.test.gank.model.Result;
 import com.test.gank.presenter.BasePresenterImpl;
 import com.trello.rxlifecycle.components.support.RxFragment;
 
 import java.util.List;
 
-import retrofit2.adapter.rxjava.Result;
 import rx.Observable;
 
 /**
@@ -28,16 +29,16 @@ public class HomePresenterImpl extends BasePresenterImpl implements HomePresente
     @Override
     public void requestAndroidData(int pageCount, int pageIndex) {
         mHomeView.showLoadingView();
-        Observable<Result<List<String>>> observable = ApiManger.get()
+        Observable<Result<List<GankItem>>> observable = ApiManger.get()
                 .getApiservice()
                 .requestAndroidData(pageCount, pageIndex);
 
-        HttpRx.get().doHttp(mFragment, observable, new HttpListener() {
+        HttpRx.get().doHttp(mFragment, observable, new HttpListener<List<GankItem>>() {
             @Override
-            public void onNext(Object o) {
+            public void onNext(List<GankItem> gankItemList) {
                 if (mHomeView != null) {
                     mHomeView.dismissLoadingView();
-                    mHomeView.onAndroidRequestSuccess();
+                    mHomeView.onAndroidRequestSuccess(gankItemList);
                 }
             }
 
