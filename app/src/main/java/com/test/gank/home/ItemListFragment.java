@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.test.gank.R;
 import com.test.gank.model.GankItem;
 import com.test.gank.ui.adapter.ItemListAdapter;
+import com.test.gank.ui.adapter.base.MultiItemTypeAdapter;
 import com.test.gank.ui.base.LazyLoadFragment;
 import com.test.gank.utils.App;
 
@@ -29,7 +30,7 @@ import butterknife.Unbinder;
  */
 
 public class ItemListFragment extends LazyLoadFragment implements HomeView,
-        SwipeRefreshLayout.OnRefreshListener {
+        SwipeRefreshLayout.OnRefreshListener, MultiItemTypeAdapter.OnItemClickListener {
 
     private static final String KEY_STATUS = "key_status";
     public static final int STATUS_ANDROID = 0;
@@ -87,6 +88,7 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
         mRecyclerView.setAdapter(mListAdapter);
         mRefreshLayout.setOnRefreshListener(this);
+        mListAdapter.setOnItemClickListener(this);
     }
 
     @Override
@@ -139,5 +141,12 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     @Override
     public void onRefresh() {
         requestData();
+    }
+
+    @Override
+    public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
+        // to WebView
+        switchFragment(this, WebFragment.newInstance(mItemList.get(position).getUrl(),
+                mItemList.get(position).getDesc()));
     }
 }

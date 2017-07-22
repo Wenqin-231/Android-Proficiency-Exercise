@@ -35,13 +35,13 @@ public class BaseFragment extends RxFragment {
         addFragment(fragment, fragmentId, fragment.getClass().getSimpleName());
     }
 
-    protected void switchFragment(Fragment fromFragment, Fragment toFragment, int fragmentId) {
+    protected void switchFragment(Fragment fromFragment, Fragment toFragment) {
         FragmentTransaction ft = getFragmentManager().beginTransaction()
                 .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                 .addToBackStack(null);
         if (!toFragment.isAdded()) {
             ft.hide(fromFragment)
-                    .add(fragmentId, toFragment)
+                    .add(BaseActivity.CONTENT_ID, toFragment)
                     .commit();
         } else {
             ft.hide(fromFragment)
