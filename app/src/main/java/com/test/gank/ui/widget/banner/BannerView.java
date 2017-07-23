@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -33,6 +34,9 @@ public class BannerView extends RelativeLayout {
     private GankItem mGankItem;
     private PointsAdapter pointsAdapter;
     private PageAdapter mPageAdapter;
+    private OnClickListener mParentClickListener;
+
+    private RecyclerView.OnScrollListener mOnScrollListener;
 
     public BannerView(Context context) {
         this(context, null);
@@ -66,7 +70,7 @@ public class BannerView extends RelativeLayout {
                 LinearLayoutManager.HORIZONTAL, false));
         mImagePage.setAdapter(mPageAdapter);
 
-        mImagePage.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        mOnScrollListener = new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -77,7 +81,9 @@ public class BannerView extends RelativeLayout {
                     pointsAdapter.setLightPosition(mImagePage.getCurrentPosition());
                 }
             }
-        });
+        };
+
+        mImagePage.addOnScrollListener(mOnScrollListener);
     }
 
     public void setTitleText(String text) {
@@ -101,5 +107,15 @@ public class BannerView extends RelativeLayout {
         setTitleText(gankItem.getDesc());
         setAuthorText(gankItem.getWho());
         setDateText(StringUtils.getDateWithoutTime(gankItem.getCreatedAt()));
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                getParent().requestDisallowInterceptTouchEvent(true);
+                break;
+        }
+        return super.onInterceptTouchEvent(ev);
     }
 }

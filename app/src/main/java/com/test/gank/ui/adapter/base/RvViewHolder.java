@@ -129,6 +129,7 @@ public class RvViewHolder extends RecyclerView.ViewHolder {
     public RvViewHolder addOnChldViewClickListener(final int viewId,
                                                    final OnChlidViewClickListener listener) {
         final View view = getView(viewId);
+        view.setClickable(true);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

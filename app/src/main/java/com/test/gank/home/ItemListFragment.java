@@ -15,6 +15,7 @@ import com.test.gank.R;
 import com.test.gank.model.GankItem;
 import com.test.gank.ui.adapter.ItemListAdapter;
 import com.test.gank.ui.adapter.base.MultiItemTypeAdapter;
+import com.test.gank.ui.adapter.base.OnChlidViewClickListener;
 import com.test.gank.ui.baseview.LazyLoadFragment;
 import com.test.gank.ui.baseview.WebFragment;
 import com.test.gank.utils.App;
@@ -33,7 +34,8 @@ import butterknife.Unbinder;
  */
 
 public class ItemListFragment extends LazyLoadFragment implements HomeView,
-        SwipeRefreshLayout.OnRefreshListener, MultiItemTypeAdapter.OnItemClickListener {
+        SwipeRefreshLayout.OnRefreshListener, MultiItemTypeAdapter.OnItemClickListener,
+        OnChlidViewClickListener{
 
     private static final String KEY_STATUS = "key_status";
     private static final int PAGE_SIZE = 20;
@@ -93,7 +95,8 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
         mRecyclerView.setAdapter(mListAdapter);
 
         mRefreshLayout.setOnRefreshListener(this);
-        mListAdapter.setOnItemClickListener(this);
+//        mListAdapter.setOnItemClickListener(this);
+        mListAdapter.setOnChlidViewClickListener(this);
     }
 
     @Override
@@ -163,6 +166,13 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
 
     @Override
     public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
+        // to WebView
+        switchFragment(this, WebFragment.newInstance(mItemList.get(position).getUrl(),
+                mItemList.get(position).getDesc()));
+    }
+
+    @Override
+    public void onChildViewClick(View view, int position, int viewId) {
         // to WebView
         switchFragment(this, WebFragment.newInstance(mItemList.get(position).getUrl(),
                 mItemList.get(position).getDesc()));
