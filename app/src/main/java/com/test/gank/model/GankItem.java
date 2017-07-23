@@ -7,7 +7,7 @@ import java.util.List;
  * Created by wenqin on 2017/7/22.
  */
 
-public class GankItem implements Serializable{
+public class GankItem extends LoadMoreBean implements Serializable{
 
     /**
      * _id : 5971719e421aa97de5c7c97d

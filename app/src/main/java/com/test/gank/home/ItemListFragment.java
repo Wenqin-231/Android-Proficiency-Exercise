@@ -35,7 +35,7 @@ import butterknife.Unbinder;
 
 public class ItemListFragment extends LazyLoadFragment implements HomeView,
         SwipeRefreshLayout.OnRefreshListener, MultiItemTypeAdapter.OnItemClickListener,
-        OnChlidViewClickListener{
+        OnChlidViewClickListener {
 
     private static final String KEY_STATUS = "key_status";
     private static final int PAGE_SIZE = 20;
@@ -54,6 +54,8 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     private HomePresenter mHomePresenter;
     private List<GankItem> mItemList;
     private ItemListAdapter mListAdapter;
+
+    private boolean isOnLoadMore = false;
 
     public static ItemListFragment newInstance(int status) {
 
@@ -90,13 +92,38 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     private void initView() {
         mItemList = new ArrayList<>();
         mListAdapter = new ItemListAdapter(this, mActivity, mItemList);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mActivity);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.addItemDecoration(new ListItemDecoration());
         mRecyclerView.setAdapter(mListAdapter);
 
         mRefreshLayout.setOnRefreshListener(this);
 //        mListAdapter.setOnItemClickListener(this);
         mListAdapter.setOnChlidViewClickListener(this);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
+                if (lastVisibleItemPosition == mItemList.size() - 1) {
+
+                    boolean isRefreshing = mRefreshLayout.isRefreshing();
+                    if (isRefreshing) {
+                        return;
+                    }
+                    if (!isOnLoadMore) {
+                        isOnLoadMore = true;
+                        onLoadMoreData();
+                    }
+
+                }
+            }
+        });
     }
 
     @Override
@@ -135,7 +162,13 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
 
     @Override
     public void onRequestSuccess(List<GankItem> itemList) {
+        isOnLoadMore = false;
         mRefreshLayout.setRefreshing(false);
+        if (itemList == null || itemList.isEmpty()) {
+            mListAdapter.setLoadMoreEnable(false);
+            return;
+        }
+        mListAdapter.hideLoadMore();
 
         // updateView
         int lastPosition = mItemList.size() - 1;
@@ -147,7 +180,7 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
         if (lastPosition < 0) {
             lastPosition = 0;
         }
-        mListAdapter.notifyItemRangeInserted(lastPosition, mItemList.size() - 1);
+        mListAdapter.notifyItemRangeInserted(lastPosition + 1, mItemList.size() - 1);
 
         // add pageIndex when request success
         mPageIndex++;
@@ -156,6 +189,8 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     @Override
     public void onRequestError() {
         mRefreshLayout.setRefreshing(false);
+        mListAdapter.setLoadMoreEnable(false);
+        isOnLoadMore = false;
     }
 
     @Override
@@ -163,6 +198,12 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
         mPageIndex = 1;
         requestData();
     }
+
+    private void onLoadMoreData() {
+        mListAdapter.setLoadMoreEnable(true);
+        requestData();
+    }
+
 
     @Override
     public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {

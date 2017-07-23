@@ -13,7 +13,6 @@ import java.util.List;
 
 @SuppressWarnings("ALL")
 public abstract class MultiItemTypeAdapter<T> extends RecyclerView.Adapter<RvViewHolder> {
-
     protected Context mContext;
     protected List<T> data;
 

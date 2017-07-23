@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide;
 import com.lsjwzh.widget.recyclerviewpager.RecyclerViewPager;
 import com.test.gank.R;
 import com.test.gank.model.GankItem;
+import com.test.gank.model.LoadMoreBean;
 import com.test.gank.ui.adapter.base.ItemViewDelegate;
 import com.test.gank.ui.adapter.base.MultiItemTypeAdapter;
 import com.test.gank.ui.adapter.base.RvViewHolder;
@@ -36,6 +37,7 @@ public class ItemListAdapter extends MultiItemTypeAdapter<GankItem> {
         mFragment = fragment;
         addItemViewDelegate(new TextDelegate());
         addItemViewDelegate(new ImageDelegate());
+        addItemViewDelegate(new LoadMoreDelegate());
     }
 
     private class TextDelegate implements ItemViewDelegate<GankItem> {
@@ -47,7 +49,7 @@ public class ItemListAdapter extends MultiItemTypeAdapter<GankItem> {
 
         @Override
         public boolean isForViewType(GankItem item, int position) {
-            return !isItemImage(item);
+            return !isItemImage(item) && !isLoadMore(item);
         }
 
         @Override
@@ -68,7 +70,7 @@ public class ItemListAdapter extends MultiItemTypeAdapter<GankItem> {
 
         @Override
         public boolean isForViewType(GankItem item, int position) {
-            return isItemImage(item);
+            return isItemImage(item) && !isLoadMore(item);
         }
 
         @Override
@@ -119,8 +121,55 @@ public class ItemListAdapter extends MultiItemTypeAdapter<GankItem> {
         }
     }
 
+    private class LoadMoreDelegate implements ItemViewDelegate<GankItem> {
+
+        @Override
+        public int getItemViewLayoutId() {
+            return R.layout.load_more_view;
+        }
+
+        @Override
+        public boolean isForViewType(GankItem item, int position) {
+            return isLoadMore(item);
+        }
+
+        @Override
+        public void convert(RvViewHolder holder, GankItem gankItem, int position) {
+            if (gankItem.getLoadMoreStatus() == LoadMoreBean.STATUS_END) {
+                holder.setText(R.id.load_more_text, "无更多数据");
+            } else if (gankItem.getLoadMoreStatus() == LoadMoreBean.STATUS_LOADING) {
+                holder.setText(R.id.load_more_text, "加载更多…");
+            }
+        }
+    }
+
+    public void hideLoadMore() {
+        int lastPosition = getData().size() - 1;
+        if (lastPosition >= 0 && isLoadMore(getData().get(lastPosition))) {
+            getData().remove(lastPosition);
+            notifyItemRemoved(lastPosition);
+        }
+    }
+
+    public void setLoadMoreEnable(boolean isLoading) {
+        GankItem gankItem = new GankItem();
+        if (isLoading) {
+            gankItem.setLoadMoreStatus(LoadMoreBean.STATUS_LOADING);
+        } else {
+            gankItem.setLoadMoreStatus(LoadMoreBean.STATUS_END);
+        }
+        if (getData().size() > 0 && !isLoadMore(getData().get(getData().size() - 1))) {
+            getData().add(gankItem);
+            notifyItemChanged(getData().size() - 1);
+        }
+    }
+
     private boolean isItemImage(GankItem item) {
         return item.getImages() != null && item.getImages().size() > 0;
+    }
+
+    private boolean isLoadMore(GankItem item) {
+        return item.getLoadMoreStatus() != LoadMoreBean.STATUS_DEFAULT;
     }
 
 
