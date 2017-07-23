@@ -14,6 +14,7 @@ import rx.Observable;
 
 /**
  * Created by wenqin on 2017/7/24.
+ *
  */
 
 public class SearchPresenterImpl extends BasePresenterImpl implements SearchPresenter{

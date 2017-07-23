@@ -14,7 +14,6 @@ import android.widget.Toast;
 import com.test.gank.R;
 import com.test.gank.model.GankItem;
 import com.test.gank.ui.adapter.ItemListAdapter;
-import com.test.gank.ui.adapter.base.MultiItemTypeAdapter;
 import com.test.gank.ui.adapter.base.OnChlidViewClickListener;
 import com.test.gank.ui.baseview.LazyLoadFragment;
 import com.test.gank.ui.baseview.WebFragment;
@@ -34,7 +33,7 @@ import butterknife.Unbinder;
  */
 
 public class ItemListFragment extends LazyLoadFragment implements HomeView,
-        SwipeRefreshLayout.OnRefreshListener, MultiItemTypeAdapter.OnItemClickListener,
+        SwipeRefreshLayout.OnRefreshListener,
         OnChlidViewClickListener {
 
     private static final String KEY_STATUS = "key_status";
@@ -48,7 +47,7 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     @BindView(R.id.loading_view)
     RelativeLayout mLoadingView;
 
-    private int mStatus;
+    private int mStatus; // 标识Tab类型，与外部tabLayout的position对应
     private int mPageIndex = 1;
 
     private HomePresenter mHomePresenter;
@@ -98,7 +97,6 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
         mRecyclerView.setAdapter(mListAdapter);
 
         mRefreshLayout.setOnRefreshListener(this);
-//        mListAdapter.setOnItemClickListener(this);
         mListAdapter.setOnChlidViewClickListener(this);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -110,12 +108,14 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 int lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
+                // 滚动到底部
                 if (lastVisibleItemPosition == mItemList.size() - 1) {
 
                     boolean isRefreshing = mRefreshLayout.isRefreshing();
                     if (isRefreshing) {
                         return;
                     }
+                    // 不在下拉刷新状态的时候调用OnLoadMore
                     if (!isOnLoadMore) {
                         isOnLoadMore = true;
                         onLoadMoreData();
@@ -168,6 +168,7 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
 
         // handle load more view
         if (itemList == null || itemList.isEmpty()) {
+            // show no data when data is empty
             mListAdapter.showLoadMore(false);
             return;
         }
@@ -207,14 +208,6 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     private void onLoadMoreData() {
         mListAdapter.showLoadMore(true);
         requestData();
-    }
-
-
-    @Override
-    public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
-        // to WebView
-        switchFragment(this, WebFragment.newInstance(mItemList.get(position).getUrl(),
-                mItemList.get(position).getDesc()));
     }
 
     @Override

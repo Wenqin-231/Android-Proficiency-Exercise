@@ -29,9 +29,11 @@ public class HomePresenterImpl extends BasePresenterImpl implements HomePresente
     @Override
     public void requestData(String dataStyle, int pageCount, int pageIndex) {
         mHomeView.showLoadingView();
+
         Observable<Result<List<GankItem>>> observable = ApiManger.get()
                 .getApiservice()
                 .requestData(dataStyle, pageCount, pageIndex);
+
         HttpRx.get().doHttp(mFragment, observable, new HttpListener<List<GankItem>>() {
             @Override
             public void onNext(List<GankItem> gankItemList) {

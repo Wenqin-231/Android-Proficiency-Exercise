@@ -35,7 +35,8 @@ import butterknife.Unbinder;
  * Created by wenqin on 2017/7/23.
  */
 
-public class SearchFragment extends BaseFragment implements Toolbar.OnMenuItemClickListener, SearchView, OnChlidViewClickListener {
+public class SearchFragment extends BaseFragment implements Toolbar.OnMenuItemClickListener,
+        SearchView, OnChlidViewClickListener {
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
     Unbinder unbinder;

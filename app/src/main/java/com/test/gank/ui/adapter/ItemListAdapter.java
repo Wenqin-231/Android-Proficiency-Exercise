@@ -79,7 +79,7 @@ public class ItemListAdapter extends MultiItemTypeAdapter<GankItem> {
             holder.setText(R.id.author_text, gankItem.getWho());
             holder.setText(R.id.date_text, StringUtils.getDateWithoutTime(gankItem.getPublishedAt()));
 
-            if (gankItem.getImages().size() > 1) {
+            if (gankItem.getImages().size() > 1) { // show page view
                 RecyclerView pointsRv = holder.getView(R.id.points_list);
                 pointsRv.setLayoutManager(new LinearLayoutManager(getContext(),
                         LinearLayoutManager.HORIZONTAL, false));
@@ -105,7 +105,7 @@ public class ItemListAdapter extends MultiItemTypeAdapter<GankItem> {
                 // show page
                 holder.setVisible(R.id.single_image, false);
                 holder.setVisible(R.id.image_page, true);
-            } else {
+            } else { // show single image to make Glide Cache the image in recyclerView
                 // 数目为空的在Text类型，数目大于1在上面，所以这里的图片数量必为1
                 Glide.with(mFragment).load(gankItem.getImages().get(0)
                         + "?imageView2/0/h/" + ConvertUtils.dp2px(188))
@@ -173,6 +173,4 @@ public class ItemListAdapter extends MultiItemTypeAdapter<GankItem> {
     private boolean isLoadMore(GankItem item) {
         return item.getLoadMoreStatus() != LoadMoreBean.STATUS_DEFAULT;
     }
-
-
 }

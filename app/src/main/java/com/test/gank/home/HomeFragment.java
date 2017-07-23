@@ -25,6 +25,7 @@ import butterknife.Unbinder;
 
 /**
  * Created by wenqin on 2017/7/22.
+ * 主页
  */
 
 public class HomeFragment extends BaseFragment implements Toolbar.OnMenuItemClickListener {
@@ -71,6 +72,7 @@ public class HomeFragment extends BaseFragment implements Toolbar.OnMenuItemClic
             mViewPager.setOffscreenPageLimit(i);
         }
         mTabs.setupWithViewPager(mViewPager);
+        // 禁止viewPager滚动
         mViewPager.setNoScroll(true);
         mViewPager.setAdapter(new HomePagerAdapter(getFragmentManager(),fragmentList, TAB_TITLES));
     }

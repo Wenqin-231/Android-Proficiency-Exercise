@@ -5,12 +5,14 @@ import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+/**
+ * 可以控制是否滚动的ViewPager
+ */
 public class NoScrollViewPager extends ViewPager {
     private boolean noScroll = false;  
   
     public NoScrollViewPager(Context context, AttributeSet attrs) {
-        super(context, attrs);  
-        // TODO Auto-generated constructor stub  
+        super(context, attrs);
     }  
   
     public NoScrollViewPager(Context context) {  
@@ -28,8 +30,7 @@ public class NoScrollViewPager extends ViewPager {
   
     @Override  
     public boolean onTouchEvent(MotionEvent arg0) {
-        /* return false;//super.onTouchEvent(arg0); */  
-        if (noScroll)  
+        if (noScroll)
             return false;  
         else  
             return super.onTouchEvent(arg0);  

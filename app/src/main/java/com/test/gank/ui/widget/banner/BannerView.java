@@ -19,8 +19,8 @@ import java.util.List;
 /**
  * Created by wenqin on 2017/7/23.
  * 首页可滚动的图片自定义布局
+ * no use
  */
-
 public class BannerView extends RelativeLayout {
 
     TextView mTitleText;

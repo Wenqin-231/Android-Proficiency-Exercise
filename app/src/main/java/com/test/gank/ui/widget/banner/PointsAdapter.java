@@ -36,6 +36,7 @@ public class PointsAdapter extends MultiCommonAdapter<String>{
 
     @Override
     public int getItemCount() {
+        // no show the point when data size less 2
         if (getData().size() == 1) {
             return 0;
         }
