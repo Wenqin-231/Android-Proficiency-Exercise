@@ -22,6 +22,7 @@ public class GankItem extends LoadMoreBean implements Serializable{
      * who : 代码家
      */
 
+    private static final long serialVersionUID = 7526472295622776147L;
     private String _id;
     private String createdAt;
     private String desc;

@@ -15,21 +15,15 @@ import rx.Observable;
 
 public interface ApiService {
 
-    @GET("data/Android/{pageCount}/{pageIndex}")
-    Observable<Result<List<GankItem>>> requestAndroidData(@Path("pageCount") int pageCount,
-                                                          @Path("pageIndex") int pageIndex);
-
-    @GET("data/iOS/{pageCount}/{pageIndex}")
-    Observable<Result<List<GankItem>>> requestIOSData(@Path("pageCount") int pageCount,
-                                                      @Path("pageIndex") int pageIndex);
-
-    @GET("data/前端/{pageCount}/{pageIndex}")
-    Observable<Result<List<GankItem>>> requestWedData(@Path("pageCount") int pageCount,
-                                                      @Path("pageIndex") int pageIndex);
-
     @GET("data/{dataStyle}/{pageCount}/{pageIndex}")
     Observable<Result<List<GankItem>>> requestData(@Path("dataStyle") String dataStyle,
                                                    @Path("pageCount") int pageCount,
                                                    @Path("pageIndex") int pageIndex);
+
+    @GET("search/query/{searchContent}/category/all/count/{pageCount}/page/{pageIndex}")
+    Observable<Result<List<GankItem>>> searchData(@Path("searchContent") String searchContent,
+                                                  @Path("pageCount") int pageCount,
+                                                  @Path("pageIndex") int pageIndex);
+
 
 }

@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.jakewharton.butterknife'
+apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 25
@@ -64,4 +65,6 @@ dependencies {
     compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
 
     compile 'com.github.lsjwzh.RecyclerViewPager:lib:v1.1.2@aar'
+
+    compile 'org.greenrobot:greendao:3.2.2'
 }

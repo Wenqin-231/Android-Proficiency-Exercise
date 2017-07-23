@@ -102,16 +102,18 @@ public class ItemListAdapter extends MultiItemTypeAdapter<GankItem> {
                         }
                     }
                 });
+                // show page
                 holder.setVisible(R.id.single_image, false);
                 holder.setVisible(R.id.image_page, true);
             } else {
                 // 数目为空的在Text类型，数目大于1在上面，所以这里的图片数量必为1
-                Glide.with(mContext).load(gankItem.getImages().get(0)
+                Glide.with(mFragment).load(gankItem.getImages().get(0)
                         + "?imageView2/0/h/" + ConvertUtils.dp2px(188))
                         .crossFade()
                         .placeholder(R.mipmap.load)
                         .error(R.mipmap.notfound)
                         .into((ImageView) holder.getView(R.id.single_image));
+                // hide page
                 holder.setVisible(R.id.single_image, true);
                 holder.setVisible(R.id.image_page, false);
             }
@@ -151,7 +153,7 @@ public class ItemListAdapter extends MultiItemTypeAdapter<GankItem> {
         }
     }
 
-    public void setLoadMoreEnable(boolean isLoading) {
+    public void showLoadMore(boolean isLoading) {
         GankItem gankItem = new GankItem();
         if (isLoading) {
             gankItem.setLoadMoreStatus(LoadMoreBean.STATUS_LOADING);

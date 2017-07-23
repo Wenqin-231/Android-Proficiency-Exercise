@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.test.gank.R;
+import com.test.gank.search.SearchFragment;
 import com.test.gank.ui.adapter.HomePagerAdapter;
 import com.test.gank.ui.baseview.BaseFragment;
 import com.test.gank.ui.widget.NoScrollViewPager;
@@ -84,7 +85,7 @@ public class HomeFragment extends BaseFragment implements Toolbar.OnMenuItemClic
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_search:
-                // search click
+                switchFragment(this, SearchFragment.newInstance());
                 break;
         }
         return false;

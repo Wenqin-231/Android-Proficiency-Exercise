@@ -1,25 +1,28 @@
-package com.test.gank.home;
+package com.test.gank.search;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.test.gank.R;
 import com.test.gank.model.GankItem;
 import com.test.gank.ui.adapter.ItemListAdapter;
-import com.test.gank.ui.adapter.base.MultiItemTypeAdapter;
 import com.test.gank.ui.adapter.base.OnChlidViewClickListener;
-import com.test.gank.ui.baseview.LazyLoadFragment;
+import com.test.gank.ui.baseview.BaseFragment;
 import com.test.gank.ui.baseview.WebFragment;
 import com.test.gank.utils.App;
-import com.test.gank.utils.ListItemDecoration;
+import com.test.gank.utils.SoftInputUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,39 +32,35 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 /**
- * Created by wenqin on 2017/7/22.
- * 列表Fragment
+ * Created by wenqin on 2017/7/23.
  */
 
-public class ItemListFragment extends LazyLoadFragment implements HomeView,
-        SwipeRefreshLayout.OnRefreshListener, MultiItemTypeAdapter.OnItemClickListener,
-        OnChlidViewClickListener {
-
-    private static final String KEY_STATUS = "key_status";
-    private static final int PAGE_SIZE = 20;
-
+public class SearchFragment extends BaseFragment implements Toolbar.OnMenuItemClickListener, SearchView, OnChlidViewClickListener {
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
-    @BindView(R.id.refresh_layout)
-    SwipeRefreshLayout mRefreshLayout;
     Unbinder unbinder;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.progress_bar)
+    ProgressBar mProgressBar;
+    @BindView(R.id.tips_text)
+    TextView mTipsText;
     @BindView(R.id.loading_view)
     RelativeLayout mLoadingView;
+    @BindView(R.id.search_edit)
+    EditText mSearchEdit;
 
-    private int mStatus;
-    private int mPageIndex = 1;
-
-    private HomePresenter mHomePresenter;
-    private List<GankItem> mItemList;
     private ItemListAdapter mListAdapter;
-
+    private List<GankItem> mItemList;
+    private int pageIndex = 1;
     private boolean isOnLoadMore = false;
+    private SearchPresenter mSearchPresenter;
 
-    public static ItemListFragment newInstance(int status) {
+    public static SearchFragment newInstance() {
 
         Bundle args = new Bundle();
-        args.putInt(KEY_STATUS, status);
-        ItemListFragment fragment = new ItemListFragment();
+
+        SearchFragment fragment = new SearchFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,17 +68,14 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mStatus = getArguments().getInt(KEY_STATUS);
-        }
-        mHomePresenter = new HomePresenterImpl(this, this);
+        mSearchPresenter = new SearchPresenterImpl(this, this);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
         unbinder = ButterKnife.bind(this, view);
         return view;
     }
@@ -87,19 +83,26 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-    }
 
-    private void initView() {
         mItemList = new ArrayList<>();
         mListAdapter = new ItemListAdapter(this, mActivity, mItemList);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mActivity);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.addItemDecoration(new ListItemDecoration());
         mRecyclerView.setAdapter(mListAdapter);
 
-        mRefreshLayout.setOnRefreshListener(this);
-//        mListAdapter.setOnItemClickListener(this);
-        mListAdapter.setOnChlidViewClickListener(this);
+        mToolbar.inflateMenu(R.menu.menu_home);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mActivity.onBackPressed();
+            }
+        });
+        mToolbar.setOnMenuItemClickListener(this);
+
+        showDefaultView();
+        mSearchEdit.requestFocus();
+        SoftInputUtils.showSoftInput(mActivity);
+
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -112,10 +115,6 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
                 int lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
                 if (lastVisibleItemPosition == mItemList.size() - 1) {
 
-                    boolean isRefreshing = mRefreshLayout.isRefreshing();
-                    if (isRefreshing) {
-                        return;
-                    }
                     if (!isOnLoadMore) {
                         isOnLoadMore = true;
                         onLoadMoreData();
@@ -124,30 +123,47 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
                 }
             }
         });
+        mListAdapter.setOnChlidViewClickListener(this);
+
     }
 
-    @Override
-    public void fetchData() {
-        initView();
-        onRefresh();
+    private void onLoadMoreData() {
+        mSearchPresenter.search(mSearchEdit.getText().toString(), 20, pageIndex);
     }
 
-    private void requestData() {
-        mHomePresenter.requestData(HomeFragment.TAB_TITLES[mStatus], PAGE_SIZE, mPageIndex);
+
+    private void showDefaultView() {
+        mProgressBar.setVisibility(View.GONE);
+        mTipsText.setVisibility(View.VISIBLE);
+        mLoadingView.setVisibility(View.VISIBLE);
+        mTipsText.setText("请搜索");
+    }
+
+    private void showListView() {
+        mLoadingView.setVisibility(View.GONE);
+    }
+
+    private void showNoDataView() {
+        mProgressBar.setVisibility(View.GONE);
+        mTipsText.setVisibility(View.VISIBLE);
+        mLoadingView.setVisibility(View.VISIBLE);
+        mTipsText.setText("暂无数据，换个关键字看看");
     }
 
     @Override
     public void showLoadingView() {
-        // 当数据为空并且不在下拉刷新的时候显示LoadingView
-        if (mListAdapter.getItemCount() == 0 && !mRefreshLayout.isRefreshing()) {
+        if (pageIndex == 1) {
+            mProgressBar.setVisibility(View.VISIBLE);
             mLoadingView.setVisibility(View.VISIBLE);
+            mTipsText.setVisibility(View.GONE);
+        } else {
+            mListAdapter.showLoadMore(true);
         }
     }
 
     @Override
     public void dismissLoadingView() {
-        mLoadingView.setVisibility(View.GONE);
-        //TODO load DataBase data
+        showListView();
     }
 
     @Override
@@ -158,63 +174,62 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        SoftInputUtils.hideSoftInput(mActivity);
         unbinder.unbind();
     }
 
     @Override
-    public void onRequestSuccess(List<GankItem> itemList) {
-        isOnLoadMore = false;
-        mRefreshLayout.setRefreshing(false);
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_search:
+                toSearch(mSearchEdit.getText().toString());
+                SoftInputUtils.hideSoftInput(mActivity);
+                break;
+        }
+        return false;
+    }
 
-        // handle load more view
-        if (itemList == null || itemList.isEmpty()) {
-            mListAdapter.showLoadMore(false);
+    private void toSearch(String s) {
+        pageIndex = 1;
+        mSearchPresenter.search(s, 20, pageIndex);
+    }
+
+    @Override
+    public void onRequestSuccess(List<GankItem> data) {
+        isOnLoadMore = false;
+        if (data == null || data.isEmpty()) {
+            if (pageIndex == 1) {
+                showNoDataView();
+            } else {
+                // show no more data
+                mListAdapter.showLoadMore(false);
+            }
             return;
         }
         mListAdapter.hideLoadMore();
 
+        showListView();
+
         // updateView
         int lastPosition = mItemList.size() - 1;
         // onRefresh or first load
-        if (mPageIndex == 1) {
+        if (pageIndex == 1) {
             mItemList.clear();
         }
-        mItemList.addAll(itemList);
+        mItemList.addAll(data);
         if (lastPosition < 0) {
             lastPosition = 0;
         }
         mListAdapter.notifyItemRangeInserted(lastPosition + 1, mItemList.size() - 1);
 
-        //TODO insert DataBase data (Deduplication)
-
-        // add pageIndex when request success
-        mPageIndex++;
+        pageIndex++;
     }
 
     @Override
     public void onRequestError() {
-        mRefreshLayout.setRefreshing(false);
-        mListAdapter.showLoadMore(false);
         isOnLoadMore = false;
-    }
-
-    @Override
-    public void onRefresh() {
-        mPageIndex = 1;
-        requestData();
-    }
-
-    private void onLoadMoreData() {
-        mListAdapter.showLoadMore(true);
-        requestData();
-    }
-
-
-    @Override
-    public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
-        // to WebView
-        switchFragment(this, WebFragment.newInstance(mItemList.get(position).getUrl(),
-                mItemList.get(position).getDesc()));
+        Toast.makeText(getContext(), "网络访问异常", Toast.LENGTH_SHORT).show();
+        mListAdapter.hideLoadMore();
     }
 
     @Override
