@@ -1,4 +1,4 @@
-package com.test.gank.home;
+package com.test.gank.ui.baseview;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,7 +16,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.test.gank.R;
-import com.test.gank.ui.base.BaseFragment;
 import com.test.gank.utils.App;
 
 import butterknife.BindView;

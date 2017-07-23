@@ -1,4 +1,4 @@
-package com.test.gank.ui.base;
+package com.test.gank.ui.baseview;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

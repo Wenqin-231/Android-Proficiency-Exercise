@@ -14,4 +14,11 @@ public class StringUtils {
         }
         return date;
     }
+
+    public static String getDateWithoutTime(String dateStr) {
+        if (!TextUtils.isEmpty(dateStr) && dateStr.contains("T")) {
+            return dateStr.substring(0, dateStr.indexOf("T"));
+        }
+        return dateStr;
+    }
 }

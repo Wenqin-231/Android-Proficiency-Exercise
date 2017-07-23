@@ -15,7 +15,8 @@ import com.test.gank.R;
 import com.test.gank.model.GankItem;
 import com.test.gank.ui.adapter.ItemListAdapter;
 import com.test.gank.ui.adapter.base.MultiItemTypeAdapter;
-import com.test.gank.ui.base.LazyLoadFragment;
+import com.test.gank.ui.baseview.LazyLoadFragment;
+import com.test.gank.ui.baseview.WebFragment;
 import com.test.gank.utils.App;
 import com.test.gank.utils.ListItemDecoration;
 
@@ -28,15 +29,15 @@ import butterknife.Unbinder;
 
 /**
  * Created by wenqin on 2017/7/22.
+ * 列表Fragment
  */
 
 public class ItemListFragment extends LazyLoadFragment implements HomeView,
         SwipeRefreshLayout.OnRefreshListener, MultiItemTypeAdapter.OnItemClickListener {
 
     private static final String KEY_STATUS = "key_status";
-    public static final int STATUS_ANDROID = 0;
-    public static final int STATUS_IOS = 1;
-    public static final int STATUS_WEB = 2;
+    private static final int PAGE_SIZE = 20;
+
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
     @BindView(R.id.refresh_layout)
@@ -46,6 +47,7 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     LinearLayout mLoadingView;
 
     private int mStatus;
+    private int mPageIndex = 1;
 
     private HomePresenter mHomePresenter;
     private List<GankItem> mItemList;
@@ -97,11 +99,11 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     @Override
     public void fetchData() {
         initView();
-        requestData();
+        onRefresh();
     }
 
     private void requestData() {
-        mHomePresenter.requestData(HomeFragment.TAB_TITLES[mStatus], 10, 1);
+        mHomePresenter.requestData(HomeFragment.TAB_TITLES[mStatus], PAGE_SIZE, mPageIndex);
     }
 
     @Override
@@ -131,9 +133,21 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     @Override
     public void onRequestSuccess(List<GankItem> itemList) {
         mRefreshLayout.setRefreshing(false);
-        mItemList.clear();
+
+        // updateView
+        int lastPosition = mItemList.size() - 1;
+        // onRefresh or first load
+        if (mPageIndex == 1) {
+            mItemList.clear();
+        }
         mItemList.addAll(itemList);
-        mListAdapter.notifyDataSetChanged();
+        if (lastPosition < 0) {
+            lastPosition = 0;
+        }
+        mListAdapter.notifyItemRangeInserted(lastPosition, mItemList.size() - 1);
+
+        // add pageIndex when request success
+        mPageIndex++;
     }
 
     @Override
@@ -143,6 +157,7 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
 
     @Override
     public void onRefresh() {
+        mPageIndex = 1;
         requestData();
     }
 

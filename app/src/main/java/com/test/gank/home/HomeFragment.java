@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -13,7 +12,8 @@ import android.view.ViewGroup;
 
 import com.test.gank.R;
 import com.test.gank.ui.adapter.HomePagerAdapter;
-import com.test.gank.ui.base.BaseFragment;
+import com.test.gank.ui.baseview.BaseFragment;
+import com.test.gank.ui.widget.NoScrollViewPager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class HomeFragment extends BaseFragment implements Toolbar.OnMenuItemClic
     TabLayout mTabs;
     Unbinder unbinder;
     @BindView(R.id.view_pager)
-    ViewPager mViewPager;
+    NoScrollViewPager mViewPager;
 
     public static final String[] TAB_TITLES = {"Android", "iOS", "前端"};
 
@@ -70,6 +70,7 @@ public class HomeFragment extends BaseFragment implements Toolbar.OnMenuItemClic
             mViewPager.setOffscreenPageLimit(i);
         }
         mTabs.setupWithViewPager(mViewPager);
+        mViewPager.setNoScroll(true);
         mViewPager.setAdapter(new HomePagerAdapter(getFragmentManager(),fragmentList, TAB_TITLES));
     }
 
