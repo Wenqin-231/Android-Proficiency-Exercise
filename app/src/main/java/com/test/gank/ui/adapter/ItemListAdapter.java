@@ -104,6 +104,7 @@ public class ItemListAdapter extends MultiItemTypeAdapter<GankItem> {
                 });
                 // show page
                 holder.setVisible(R.id.single_image, false);
+                holder.setVisible(R.id.points_list, true);
                 holder.setVisible(R.id.image_page, true);
             } else { // show single image to make Glide Cache the image in recyclerView
                 // 数目为空的在Text类型，数目大于1在上面，所以这里的图片数量必为1
@@ -113,9 +114,10 @@ public class ItemListAdapter extends MultiItemTypeAdapter<GankItem> {
                         .placeholder(R.mipmap.load)
                         .error(R.mipmap.notfound)
                         .into((ImageView) holder.getView(R.id.single_image));
-                // hide page
+                // hide page and points
                 holder.setVisible(R.id.single_image, true);
                 holder.setVisible(R.id.image_page, false);
+                holder.setVisible(R.id.points_list, false);
             }
 
             holder.addOnChldViewClickListener(R.id.banner_layout, mOnChlidViewClickListener);
