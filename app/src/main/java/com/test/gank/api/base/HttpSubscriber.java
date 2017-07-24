@@ -2,12 +2,11 @@ package com.test.gank.api.base;
 
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.test.gank.model.Result;
-import com.test.gank.utils.App;
 import com.test.gank.utils.NetworkUtil;
+import com.test.gank.utils.ToastUtils;
 
 import java.io.IOException;
 
@@ -54,7 +53,7 @@ public class HttpSubscriber<T> extends Subscriber<T> {
                 if (body != null) body.close();
             }
         } else {
-            Toast.makeText(App.getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            ToastUtils.showShortSafe("网络访问异常");
         }
 
 
@@ -65,7 +64,7 @@ public class HttpSubscriber<T> extends Subscriber<T> {
 
     private void ToastError() {
         // 这里本来是可以根据返回的code处理相关的错误提示，但是Gank Api没有code错误处理
-        Toast.makeText(App.getContext(), "网络访问异常", Toast.LENGTH_SHORT).show();
+        ToastUtils.showShortSafe("网络访问异常");
     }
 
     @SuppressWarnings("unchecked")

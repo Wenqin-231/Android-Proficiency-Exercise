@@ -68,13 +68,13 @@ public class HomeFragment extends BaseFragment implements Toolbar.OnMenuItemClic
 
         List<Fragment> fragmentList = new ArrayList<>();
         for (int i = 0; i < TAB_TITLES.length; i++) {
-            fragmentList.add(ItemListFragment.newInstance(i));
+            fragmentList.add(ItemListFragment.newInstance(TAB_TITLES[i]));
             mViewPager.setOffscreenPageLimit(i);
         }
         mTabs.setupWithViewPager(mViewPager);
         // 禁止viewPager滚动
         mViewPager.setNoScroll(true);
-        mViewPager.setAdapter(new HomePagerAdapter(getFragmentManager(),fragmentList, TAB_TITLES));
+        mViewPager.setAdapter(new HomePagerAdapter(getFragmentManager(), fragmentList, TAB_TITLES));
     }
 
     @Override

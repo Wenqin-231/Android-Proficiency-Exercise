@@ -59,7 +59,7 @@ public class HttpRx {
     }
 
     @SuppressWarnings("unchecked")
-    public Subscription doHttp(RxFragment rxFragment , Observable observable,
+    public Subscription doHttp(RxFragment rxFragment, Observable observable,
                                HttpListener httpListener) {
 
         HttpSubscriber httpSubscriber = new HttpSubscriber(httpListener);
@@ -71,6 +71,23 @@ public class HttpRx {
                 .map(httpSubscriber.getFunc())
                 .subscribe(httpSubscriber);
 
+        return subscription;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Subscription doHttp(RxFragment rxFragment, Observable observable,
+                               OnDoNextListener onDoNextListener,
+                               HttpListener httpListener) {
+        OnNextSubscriber onNextSubscriber = new OnNextSubscriber(onDoNextListener);
+        HttpSubscriber httpSubscriber = new HttpSubscriber(httpListener);
+        Subscription subscription = observable
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(rxFragment.bindToLifecycle())
+                .doOnNext(onNextSubscriber)
+                .map(httpSubscriber.getFunc())
+                .subscribe(httpSubscriber);
         return subscription;
     }
 

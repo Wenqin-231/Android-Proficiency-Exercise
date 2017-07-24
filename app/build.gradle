@@ -34,6 +34,11 @@ android {
     }
 }
 
+greendao{
+    daoPackage 'com.test.gank.db'
+    targetGenDir 'src/main/java'
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

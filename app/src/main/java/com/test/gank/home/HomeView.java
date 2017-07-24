@@ -14,4 +14,6 @@ public interface HomeView extends BaseView{
     void onRequestSuccess(List<GankItem> data);
 
     void onRequestError();
+
+    void onQueryData(List<GankItem> data);
 }

@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.test.gank.R;
+import com.test.gank.db.DaoSession;
 import com.test.gank.model.GankItem;
 import com.test.gank.ui.adapter.ItemListAdapter;
 import com.test.gank.ui.adapter.base.OnChlidViewClickListener;
@@ -36,7 +37,7 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
         SwipeRefreshLayout.OnRefreshListener,
         OnChlidViewClickListener {
 
-    private static final String KEY_STATUS = "key_status";
+    private static final String KEY_TYPE = "key_status";
     private static final int PAGE_SIZE = 20;
 
     @BindView(R.id.recycler_view)
@@ -47,7 +48,7 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     @BindView(R.id.loading_view)
     RelativeLayout mLoadingView;
 
-    private int mStatus; // 标识Tab类型，与外部tabLayout的position对应
+    private String mType; // 表示Tab类型
     private int mPageIndex = 1;
 
     private HomePresenter mHomePresenter;
@@ -56,10 +57,10 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
 
     private boolean isOnLoadMore = false;
 
-    public static ItemListFragment newInstance(int status) {
+    public static ItemListFragment newInstance(String type) {
 
         Bundle args = new Bundle();
-        args.putInt(KEY_STATUS, status);
+        args.putString(KEY_TYPE, type);
         ItemListFragment fragment = new ItemListFragment();
         fragment.setArguments(args);
         return fragment;
@@ -69,9 +70,10 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mStatus = getArguments().getInt(KEY_STATUS);
+            mType = getArguments().getString(KEY_TYPE);
         }
-        mHomePresenter = new HomePresenterImpl(this, this);
+        DaoSession daoSession = ((App) (mActivity.getApplication())).getDaoSession();
+        mHomePresenter = new HomePresenterImpl(this, this, daoSession);
     }
 
     @Nullable
@@ -83,9 +85,13 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
         return view;
     }
 
+    /**
+     * LazyLoadFragment回调方法，把onActivityResult在这里处理
+     */
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void fetchData() {
+        initView();
+        onRefresh();
     }
 
     private void initView() {
@@ -126,14 +132,8 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
         });
     }
 
-    @Override
-    public void fetchData() {
-        initView();
-        onRefresh();
-    }
-
     private void requestData() {
-        mHomePresenter.requestData(HomeFragment.TAB_TITLES[mStatus], PAGE_SIZE, mPageIndex);
+        mHomePresenter.requestData(mType, PAGE_SIZE, mPageIndex);
     }
 
     @Override
@@ -147,7 +147,6 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     @Override
     public void dismissLoadingView() {
         mLoadingView.setVisibility(View.GONE);
-        //TODO load DataBase data
     }
 
     @Override
@@ -165,7 +164,15 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
     public void onRequestSuccess(List<GankItem> itemList) {
         isOnLoadMore = false;
         mRefreshLayout.setRefreshing(false);
+        mHomePresenter.insertData(itemList);
+        // updateView
+        updateView(itemList);
+        // add pageIndex when request success
+        mPageIndex++;
+    }
 
+
+    private void updateView(List<GankItem> itemList) {
         // handle load more view
         if (itemList == null || itemList.isEmpty()) {
             // show no data when data is empty
@@ -174,22 +181,16 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
         }
         mListAdapter.hideLoadMore();
 
-        // updateView
-        int lastPosition = mItemList.size() - 1;
         // onRefresh or first load
+        int lastPosition = mItemList.size() - 1;
         if (mPageIndex == 1) {
             mItemList.clear();
         }
         mItemList.addAll(itemList);
-        if (lastPosition < 0) {
-            lastPosition = 0;
+        if (mPageIndex == 1) {
+            mListAdapter.notifyDataSetChanged();
         }
-        mListAdapter.notifyItemRangeInserted(lastPosition + 1, mItemList.size() - 1);
-
-        //TODO insert DataBase data (Deduplication)
-
-        // add pageIndex when request success
-        mPageIndex++;
+        mListAdapter.notifyItemChanged(lastPosition + 1, mItemList.size() - 1);
     }
 
     @Override
@@ -197,6 +198,15 @@ public class ItemListFragment extends LazyLoadFragment implements HomeView,
         mRefreshLayout.setRefreshing(false);
         mListAdapter.showLoadMore(false);
         isOnLoadMore = false;
+        // query data when load data fail
+        // when query first page fail, query all database data
+        GankItem gankItem = (mPageIndex == 1) ? null : mItemList.get(mItemList.size() - 2);
+        mHomePresenter.queryDbData(mType, gankItem);
+    }
+
+    @Override
+    public void onQueryData(List<GankItem> data) {
+        updateView(data);
     }
 
     @Override

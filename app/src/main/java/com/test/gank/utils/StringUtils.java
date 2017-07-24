@@ -8,11 +8,18 @@ import android.text.TextUtils;
 
 public class StringUtils {
 
-    public static String getDateText(String date) {
-        if (!TextUtils.isEmpty(date) && date.length() >= 20) {
-            return date.substring(0, 19).replace("T", " ");
-        }
+    //2017-07-24T12:13:11.280Z
+    private static final String PUBLISH_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+    public static String getDateText(long mills) {
+        String date = TimeUtils.millis2String(mills, PUBLISH_FORMAT);
+        date = date.replace(" ", "T") + ".280Z";
         return date;
+    }
+
+    public static long getDateTextMills(String date) {
+        date = date.replace(" ", "T").substring(0, PUBLISH_FORMAT.length());
+        return TimeUtils.string2Millis(date, PUBLISH_FORMAT);
     }
 
     public static String getDateWithoutTime(String dateStr) {
